@@ -12,3 +12,7 @@ client: client.c csapp.c
 
 clean:
 	rm -f server client
+rs:
+	./server 8080
+rc: 
+	./client localhost 8080

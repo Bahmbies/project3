@@ -5,6 +5,7 @@
 
 void add_record(char *record_data) {
     FILE *file = fopen(RECORDS_FILE, "a");
+    printf("add_record");
     if (file == NULL) {
         fprintf(stderr, "Error opening records file\n");
         return; 
@@ -104,6 +105,8 @@ int main(int argc, char **argv) {
         Getnameinfo((SA *)&clientaddr, clientlen, client_hostname, MAXLINE, client_port, MAXLINE, 0);
         printf("Connected to (%s, %s)\n", client_hostname, client_port);
         // Handle client requests
+        printf("Handle req\n");
+        printf("connfd %d\n", connfd);
         handle_client(connfd);
         Close(connfd);
     }
