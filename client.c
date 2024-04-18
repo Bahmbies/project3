@@ -6,6 +6,9 @@
 // Function to process user-selected option
 void process_option(int option, int clientfd);
 
+// Funciton to get record information from user
+void get_record_info(char* s);
+
 int main(int argc, char *argv[]) {
     // Check for correct number of command-line arguments
     if (argc != 3) {
@@ -47,50 +50,102 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+
+void concat(char dest[], const char src[]) {
+	int i,j;
+	for (i = 0; i < dest[i] != '\0'; i++);
+
+	dest[i++] = ',';
+
+	for (j = 0; src[j] != '\0'; j++) {
+		dest[i + j] = src[j];
+	}
+
+	dest[i+j] = '\0';
+}
+
+void get_record_info(char* s) {
+            int c;
+            // Add record functionality
+            printf("Adding a new record...\n");
+            // clear the buffer 
+            while ((c = getchar()) != '\n' && c != EOF);
+	    char fname[100];
+	    char lname[100];
+	    char zip[100];
+	    char dept[100];
+	    char salary[100];
+
+            // Prompt user for record details
+            printf("Enter First Name: \n");
+            if (fgets(fname, MAXLINE, stdin) == NULL) {
+                fprintf(stderr, "Error reading input\n");
+                exit(EXIT_FAILURE);
+            }
+
+            printf("Enter Last Name: \n");
+            if (fgets(lname, MAXLINE, stdin) == NULL) {
+                fprintf(stderr, "Error reading input\n");
+                exit(EXIT_FAILURE);
+            }
+
+            printf("Enter Zip: \n");
+            if (fgets(zip, MAXLINE, stdin) == NULL) {
+                fprintf(stderr, "Error reading input\n");
+                exit(EXIT_FAILURE);
+            }
+
+            printf("Enter Salary: \n");
+            if (fgets(salary, MAXLINE, stdin) == NULL) {
+                fprintf(stderr, "Error reading input\n");
+                exit(EXIT_FAILURE);
+            }
+
+            printf("Enter Dept: \n");
+            if (fgets(dept, MAXLINE, stdin) == NULL) {
+                fprintf(stderr, "Error reading input\n");
+                exit(EXIT_FAILURE);
+            }
+
+
+            fname[strcspn(fname, "\n")] = '\0'; // Remove newline character
+            lname[strcspn(lname, "\n")] = '\0'; // Remove newline character
+            zip[strcspn(zip, "\n")] = '\0'; // Remove newline character
+            salary[strcspn(salary, "\n")] = '\0'; // Remove newline character
+            dept[strcspn(dept, "\n")] = '\0'; // Remove newline character
+
+	    printf("fname: %s\n", fname);
+	    printf("lname: %s\n", lname);
+	    printf("zip: %s\n", zip);
+	    printf("salary: %s\n", salary);
+	    printf("dept: %s\n", dept);
+
+	    concat(fname, lname);
+	    concat(fname, zip);
+	    concat(fname, salary);
+	    concat(fname, dept);
+	    printf("%s\n",fname);
+
+	    s = fname;
+}
+
 // Function to process user-selected option
 void process_option(int option, int clientfd) {
-    char buf[MAXLINE];
-    char input[MAXLINE];
+    char buf[MAXLINE] = {0};
+    char input[MAXLINE] = {0};
+    char record[100] = {0};
 
     switch (option) {
         case 1:
-            // Add record functionality
-            printf("Adding a new record...\n");
+            get_record_info(record);
 
-            // Prompt user for record details
-            printf("Enter First Name: ");
-            if (fgets(input, MAXLINE, stdin) == NULL) {
-                fprintf(stderr, "Error reading input\n");
-                exit(EXIT_FAILURE);
-            }
-            input[strcspn(input, "\n")] = '\0'; // Remove newline character
-            if (rio_writen(clientfd, input, strlen(input) + 1) <= 0) {
+            // send to server
+            int res = rio_writen(clientfd, record, strlen(record) + 1);
+            printf("res: %d\n", res);
+            if ( res <= 0) {
                 printf("Connection closed by server.\n");
                 exit(EXIT_FAILURE);
             }
-
-            // clear the buffer 
-            int c;
-            while ((c = getchar()) != '\n' && c != EOF);
-
-            // Prompt user for last name
-            printf("Enter Last Name: ");
-            if (fgets(input, MAXLINE, stdin) == NULL) {
-                fprintf(stderr, "Error reading input\n");
-                exit(EXIT_FAILURE);
-            }
-            input[strcspn(input, "\n")] = '\0'; // Remove newline character
-            if (rio_writen(clientfd, input, strlen(input) + 1) <= 0) {
-                printf("Connection closed by server.\n");
-                exit(EXIT_FAILURE);
-            }
-
-            // Receive response from server
-            if (Rio_readlineb(clientfd, buf, MAXLINE) <= 0) {
-                printf("Connection closed by server.\n");
-                exit(EXIT_FAILURE);
-            }
-            printf("Message From Server: %s", buf);
             break;
 
         case 2:
@@ -107,6 +162,7 @@ void process_option(int option, int clientfd) {
             }
 
              // clear the buffer 
+	    int c;
             while ((c = getchar()) != '\n' && c != EOF);
 
 
